@@ -1,0 +1,33 @@
+module top_module(
+    input clk,
+    input areset,    // Freshly brainwashed Lemmings walk left.
+    input bump_left,
+    input bump_right,
+    input ground,
+    output walk_left,
+    output walk_right,
+    output aaah ); 
+    //共有4个状态：
+    parameter left=0,right=1,fall_l=2,fall_r=3;
+    reg[1:0] state,next_state;
+    //状态转移
+    always@(*)begin
+        case(state)
+            left:next_state=ground?(bump_left?right:left):fall_l;
+            right:next_state=ground?(bump_right?left:right):fall_r;
+            fall_l:next_state=ground?left:fall_l;
+            fall_r:next_state=ground?right:fall_r;
+        endcase
+    end
+    always@(posedge clk or posedge areset)begin
+        if(areset)
+            state<=left;
+        else
+            state<=next_state;
+    end
+    assign walk_left=(state==left);
+    assign walk_right=(state==right);
+    assign aaah=(state==fall_l || state==fall_r);
+    
+
+endmodule
